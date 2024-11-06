@@ -1,16 +1,63 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>HWID Whitelist</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>HWID Verification</title>
+  <!-- Firebase SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore.js"></script>
 </head>
 <body>
-    <h1>HWID Whitelisting</h1>
-    <form action="/submit-hwid" method="POST">
-        <label for="hwid">Enter your HWID:</label><br>
-        <input type="text" id="hwid" name="hwid"><br><br>
-        <input type="submit" value="Submit">
-    </form>
+  <h1>HWID Verification</h1>
+  <p id="status">Verifying...</p>
+
+  <script>
+    // Firebase Configuration
+    const firebaseConfig = {
+      apiKey: "AIzaSyCvMa8T0gIvT98waPhjUAlvFssb9BqWIY8",
+      authDomain: "whitelisterhwid.firebaseapp.com",
+      projectId: "whitelisterhwid",
+      storageBucket: "whitelisterhwid.firebasestorage.app",
+      messagingSenderId: "521382488365",
+      appId: "1:521382488365:web:d6efd60ae130d47201cba4"
+    };
+
+    // Initialize Firebase
+    const app = firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore(app);
+
+    // Simulate automatic input from the .exe file
+    window.onload = async () => {
+      // Simulating an automatic process where the .exe provides these values
+      const serialKey = "SOME_SERIAL_KEY";  // This would come from the .exe file
+      const hwid = "USER_HWID";             // This would also come from the .exe file
+
+      try {
+        // Perform the verification process
+        const docRef = db.collection("serial_keys").doc(serialKey);
+        const docSnapshot = await docRef.get();
+
+        if (!docSnapshot.exists) {
+          // Serial key doesn't exist, create new document with HWID
+          await docRef.set({
+            hwid: hwid
+          });
+          document.getElementById("status").innerText = "HWID successfully registered.";
+        } else {
+          // Serial key exists, check the HWID
+          const existingHwid = docSnapshot.data().hwid;
+          if (existingHwid === hwid) {
+            document.getElementById("status").innerText = "HWID matches the serial key.";
+          } else {
+            document.getElementById("status").innerText = "HWID does not match the serial key.";
+          }
+        }
+      } catch (error) {
+        console.error("Error verifying HWID: ", error);
+        document.getElementById("status").innerText = "An error occurred. Please try again.";
+      }
+    };
+  </script>
 </body>
 </html>
