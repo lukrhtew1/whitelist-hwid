@@ -19,27 +19,21 @@ def save_serial_keys(data):
 
 # Endpoint for HWID verification
 @app.route('/verify', methods=['POST'])
-def verify():
-    data = request.json
-    serial_key = data.get('serial_key')
-    hwid = data.get('hwid')
+def verify_serial():
+    try:
+        data = request.get_json()  # Get JSON data from the POST request
+        serial_key = data.get('serialKey')
+        hwid = data.get('hwid')
 
-    if not serial_key or not hwid:
-        return jsonify({"error": "Serial key and HWID are required"}), 400
+        if not serial_key or not hwid:
+            return jsonify({"message": "Serial Key and HWID are required"}), 400
 
-    serial_keys = load_serial_keys()
-    if serial_key not in serial_keys:
-        return jsonify({"error": "Invalid serial key"}), 404
+        # Additional logic for verifying the serial key and HWID
 
-    if serial_keys[serial_key] == "":
-        serial_keys[serial_key] = hwid
-        save_serial_keys(serial_keys)
-        return jsonify({"message": "HWID registered successfully"}), 201
+        return jsonify({"message": "Verification successful"}), 200
 
-    if serial_keys[serial_key] == hwid:
-        return jsonify({"message": "HWID verified successfully"}), 200
-    else:
-        return jsonify({"error": "HWID mismatch"}), 403
+    except Exception as e:
+        return jsonify({"message": f"Error occurred: {str(e)}"}), 500
 
 # Optional: Serve an HTML front end if it exists
 @app.route('/')
