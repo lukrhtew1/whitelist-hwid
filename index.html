@@ -1,1 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HWID Whitelisting Status</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background-color: white;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+            text-align: center;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .status {
+            padding: 10px;
+            margin-top: 20px;
+            border-radius: 4px;
+        }
+        .verified {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .failed {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
 
+<div class="container">
+    <h1>HWID Whitelisting Status</h1>
+
+    <div class="status" id="status">
+        Checking status...
+    </div>
+</div>
+
+<script>
+    // Optional: You can set up a WebSocket or long-polling if you want the status to update in real-time
+    // But for simplicity, we will just use a delay to simulate the checking process.
+
+    // Simulate the status update (this would normally be handled by your .exe interacting with the API)
+    setTimeout(function() {
+        // This is where the actual .exe or backend logic would be checking the verification status
+        var isVerified = false;  // Simulate failed verification (change to true for successful)
+
+        // Update the UI based on the verification result
+        var statusElement = document.getElementById('status');
+        if (isVerified) {
+            statusElement.classList.add('verified');
+            statusElement.innerHTML = 'Verification Successful!';
+        } else {
+            statusElement.classList.add('failed');
+            statusElement.innerHTML = 'Verification Failed!';
+        }
+    }, 2000);  // Delay for 2 seconds to simulate checking process
+</script>
+
+</body>
+</html>
