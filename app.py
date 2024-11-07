@@ -1,18 +1,24 @@
-from flask import Flask, request, jsonify, send_file
+from flask import Flask, request, jsonify
 import json
 import os
 
 app = Flask(__name__)
 
-# Load path to serials.json from environment variable or use default
-json_file_path = os.getenv('SERIAL_KEYS_FILE_PATH','serials.json')
+# Set the path to the serials.json file
+documents_folder = os.path.join(os.path.expanduser('~'), 'Documents')
+json_file_path = os.path.join(documents_folder,'serials.json')
 
 # Load serial keys
 def load_serial_keys():
-    with open(json_file_path, 'r') as f:
-        data = json.load(f)
-        print("Loaded serials:", data)  # Print the loaded serials
-        return data
+    try:
+        with open(json_file_path, 'r') as f:
+            data = json.load(f)
+            print("Loaded serials:", data)  # Print the loaded serials
+            return data
+    except FileNotFoundError:
+        with open(json_file_path, 'w') as f:
+            json.dump({}, f)
+        return {}
 
 # Save serial keys
 def save_serial_keys(data):
@@ -67,10 +73,5 @@ def verify_serial():
     except Exception as e:
         return jsonify({"message": f"Error occurred: {str(e)}"}), 500
 
-# Optional: Serve an HTML front end if it exists
-@app.route('/')
-def index():
-    return send_file('index.html')
-
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
+    app.run(debug=True)
