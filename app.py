@@ -28,28 +28,24 @@ def verify_serial():
         if not serial_key or not hwid:
             return jsonify({"message": "Serial Key and HWID are required"}), 400
 
-        # Load the serial keys from the JSON file
-        serial_keys = load_serial_keys()
+        # Load serial keys from the file
+        serials = load_serial_keys()
 
-        # Check if the serial key exists in the loaded keys
-        if serial_key not in serial_keys:
+        if serial_key not in serials:
             return jsonify({"message": "Invalid serial key"}), 400
-        
-        # If the serial key exists, check if there is a registered HWID
-        registered_hwid = serial_keys[serial_key]
 
-        # If no HWID is registered yet for this serial key, register the new HWID
-        if not registered_hwid:
-            serial_keys[serial_key] = hwid
-            save_serial_keys(serial_keys)  # Save the updated serial keys with the new HWID
-            return jsonify({"message": f"HWID registered successfully for serial key {serial_key}"}), 200
+        # If the serial key is already registered with an HWID, check if it matches
+        if serials[serial_key]:
+            if serials[serial_key] == hwid:
+                return jsonify({"message": "HWID already registered with this serial key"}), 200
+            else:
+                return jsonify({"message": "HWID mismatch, cannot register this HWID for the serial key"}), 400
         
-        # If a HWID is registered, verify that it matches the one sent by the client
-        if registered_hwid != hwid:
-            return jsonify({"message": "HWID does not match for the given serial key"}), 400
+        # Register the HWID for the serial key
+        serials[serial_key] = hwid
+        save_serial_keys(serials)  # Save the updated serials.json file
 
-        # Otherwise, success
-        return jsonify({"message": "Verification successful"}), 200
+        return jsonify({"message": "Verification successful, HWID registered"}), 200
 
     except Exception as e:
         return jsonify({"message": f"Error occurred: {str(e)}"}), 500
