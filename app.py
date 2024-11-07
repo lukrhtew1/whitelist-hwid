@@ -49,11 +49,13 @@ def verify_serial():
                 registered_hwid = result[0]
                 if registered_hwid:
                     if registered_hwid == hwid:
-                        return jsonify({"message": "HWID already registered with this serial key"}), 200
+                        # HWID matches, verification successful
+                        return jsonify({"message": "HWID successfully verified"}), 200
                     else:
+                        # HWID mismatch, cannot verify
                         return jsonify({"message": "HWID mismatch, cannot register this HWID for the serial key"}), 400
 
-                # Register the HWID for the serial key (update if it was empty)
+                # If the HWID field is empty, update it
                 cursor.execute('UPDATE my_schema.serials SET hwid = %s WHERE serial_key = %s', (hwid, serial_key))
                 conn.commit()
 
