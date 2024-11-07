@@ -16,9 +16,20 @@ def load_serial_keys():
 
 # Save serial keys
 def save_serial_keys(data):
-    with open(json_file_path, 'w') as f:
-        json.dump(data, f, indent=4)
-        print(f"Saved updated serials: {data}")  # Print the saved data to confirm
+    try:
+        # Save the data to the serials.json file
+        with open(json_file_path, 'w') as f:
+            json.dump(data, f, indent=4)
+        
+        # Create a JSON response to return as a string
+        json_data = json.dumps(data, indent=4)
+        print(f"Saved updated serials: {json_data}")  # Print the saved data as JSON
+        
+        return jsonify({"message": "Serials updated successfully"}), 200  # Return a successful response
+
+    except Exception as e:
+        print(f"Error saving serials: {e}")
+        return jsonify({"message": f"Error occurred: {str(e)}"}), 500
         
 # Endpoint for HWID verification
 @app.route('/verify', methods=['POST'])
@@ -50,10 +61,11 @@ def verify_serial():
         serials[serial_key] = hwid
         print(f"Registered HWID for serial {serial_key}: {hwid}")  # Debug line
 
+        serials[serial_key] = hwid
+        print(f"Registered HWID for serial {serial_key}: {hwid}")  # Debug line
+            
         # Save the updated serials to the JSON file
-        save_serial_keys(serials)
-
-        return jsonify({"message": "Verification successful, HWID registered"}), 200
+        return save_serial_keys(serials)
 
     except Exception as e:
         return jsonify({"message": f"Error occurred: {str(e)}"}), 500
