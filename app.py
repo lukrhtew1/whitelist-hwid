@@ -28,8 +28,27 @@ def verify_serial():
         if not serial_key or not hwid:
             return jsonify({"message": "Serial Key and HWID are required"}), 400
 
-        # Additional logic for verifying the serial key and HWID
+        # Load the serial keys from the JSON file
+        serial_keys = load_serial_keys()
 
+        # Check if the serial key exists in the loaded keys
+        if serial_key not in serial_keys:
+            return jsonify({"message": "Invalid serial key"}), 400
+        
+        # If the serial key exists, check if there is a registered HWID
+        registered_hwid = serial_keys[serial_key]
+
+        # If no HWID is registered yet for this serial key, register the new HWID
+        if not registered_hwid:
+            serial_keys[serial_key] = hwid
+            save_serial_keys(serial_keys)  # Save the updated serial keys with the new HWID
+            return jsonify({"message": f"HWID registered successfully for serial key {serial_key}"}), 200
+        
+        # If a HWID is registered, verify that it matches the one sent by the client
+        if registered_hwid != hwid:
+            return jsonify({"message": "HWID does not match for the given serial key"}), 400
+
+        # Otherwise, success
         return jsonify({"message": "Verification successful"}), 200
 
     except Exception as e:
