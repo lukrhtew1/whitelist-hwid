@@ -10,13 +10,16 @@ json_file_path = os.getenv('SERIAL_KEYS_FILE_PATH', 'serials.json')
 # Load serial keys
 def load_serial_keys():
     with open(json_file_path, 'r') as f:
-        return json.load(f)
+        data = json.load(f)
+        print("Loaded serials:", data)  # Print the loaded serials
+        return data
 
 # Save serial keys
 def save_serial_keys(data):
     with open(json_file_path, 'w') as f:
         json.dump(data, f, indent=4)
-
+        print(f"Saved updated serials: {data}")  # Print the saved data to confirm
+        
 # Endpoint for HWID verification
 @app.route('/verify', methods=['POST'])
 def verify_serial():
@@ -31,7 +34,9 @@ def verify_serial():
         # Load serial keys from the file
         serials = load_serial_keys()
 
+        # Check if serial key exists in the loaded serials
         if serial_key not in serials:
+            print(f"Serial key {serial_key} not found!")
             return jsonify({"message": "Invalid serial key"}), 400
 
         # If the serial key is already registered with an HWID, check if it matches
@@ -43,7 +48,10 @@ def verify_serial():
         
         # Register the HWID for the serial key
         serials[serial_key] = hwid
-        save_serial_keys(serials)  # Save the updated serials.json file
+        print(f"Registered HWID for serial {serial_key}: {hwid}")  # Debug line
+
+        # Save the updated serials to the JSON file
+        save_serial_keys(serials)
 
         return jsonify({"message": "Verification successful, HWID registered"}), 200
 
