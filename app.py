@@ -21,6 +21,14 @@ def get_db_connection():
         print(f"Error connecting to the database: {str(e)}")
         raise
 
+@app.route('/ping', methods=['GET'])
+def ping():
+    return jsonify({"message": "pong", "status": "ok"}), 200
+
+@app.route('/')
+def index():
+    return send_file('index.html')
+
 @app.route('/verify', methods=['POST'])
 def verify_serial():
     data = request.get_json()
