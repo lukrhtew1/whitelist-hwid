@@ -1,23 +1,25 @@
 from flask import Flask, request, jsonify, send_file
 import psycopg2
 import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
 
 app = Flask(__name__)
-
 
 def get_db_connection():
     try:
         conn = psycopg2.connect(
-            host="21-4v.h.filess.io",
-            database="serials_composedgo",
-            user="serials_composedgo",
-            password="3d381eb8f8533e99451f20db3e2e81f84ac60126"
+            host=os.getenv('host'),
+            database=os.getenv('database'),
+            user=os.getenv('user'),
+            password=os.getenv('password')
         )
         return conn
     except Exception as e:
         print(f"Error connecting to the database: {str(e)}")
         raise
-
 
 @app.route('/verify', methods=['POST'])
 def verify_serial():
@@ -56,4 +58,5 @@ def index():
     return send_file('index.html')
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=8000)
+    # Run the app on the host and port defined by the environment variables
+    app.run(host=os.getenv('FLASK_HOST', '0.0.0.0'), port=int(os.getenv('FLASK_PORT', 8000)))
