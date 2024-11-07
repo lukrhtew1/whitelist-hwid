@@ -32,6 +32,16 @@ def verify_serial():
 
     with get_db_connection() as conn:
         with conn.cursor() as cursor:
+            # Check if the serial_key or hwid is blacklisted
+            cursor.execute(
+                'SELECT 1 FROM serials.blacklisted WHERE serial_key = %s OR hwid = %s',
+                (serial_key, hwid)
+            )
+            blacklist_result = cursor.fetchone()
+            if blacklist_result:
+                return jsonify({"message": "Blacklisted"}), 403
+
+            # Proceed with the regular verification if not blacklisted
             cursor.execute('SET search_path TO my_schema;')
             cursor.execute('SELECT hwid FROM my_schema.serials WHERE serial_key = %s', (serial_key,))
             result = cursor.fetchone()
