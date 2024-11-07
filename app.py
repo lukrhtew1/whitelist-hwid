@@ -1,24 +1,19 @@
-from flask import Flask, request, jsonify
+
+from flask import Flask, request, jsonify, send_file
 import json
 import os
 
 app = Flask(__name__)
 
-# Set the path to the serials.json file
-documents_folder = os.path.join(os.path.expanduser('~'), 'Documents')
-json_file_path = os.path.join(documents_folder,'serials.json')
+# Load path to serials.json from environment variable or use default
+json_file_path = os.getenv('SERIAL_KEYS_FILE_PATH', 'serials.json')
 
 # Load serial keys
 def load_serial_keys():
-    try:
-        with open(json_file_path, 'r') as f:
-            data = json.load(f)
-            print("Loaded serials:", data)  # Print the loaded serials
-            return data
-    except FileNotFoundError:
-        with open(json_file_path, 'w') as f:
-            json.dump({}, f)
-        return {}
+    with open(json_file_path, 'r') as f:
+        data = json.load(f)
+        print("Loaded serials:", data)  # Print the loaded serials
+        return data
 
 # Save serial keys
 def save_serial_keys(data):
@@ -31,7 +26,7 @@ def save_serial_keys(data):
         json_data = json.dumps(data, indent=4)
         print(f"Saved updated serials: {json_data}")  # Print the saved data as JSON
         
-        return jsonify({"message": "Serials updated successfully"}), 200  # Return a successful response
+        return json_data  # Return the JSON data so it can be seen in the .exe response
 
     except Exception as e:
         print(f"Error saving serials: {e}")
@@ -68,10 +63,17 @@ def verify_serial():
         print(f"Registered HWID for serial {serial_key}: {hwid}")  # Debug line
 
         # Save the updated serials to the JSON file
-        return save_serial_keys(serials)
+        save_serial_keys(serials)
+
+        return jsonify({"message": "Verification successful, HWID registered"}), 200
 
     except Exception as e:
         return jsonify({"message": f"Error occurred: {str(e)}"}), 500
 
+# Optional: Serve an HTML front end if it exists
+@app.route('/')
+def index():
+    return send_file('index.html')
+
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='0.0.0.0', port=int(os.environ.get('PORT', 8000)))
