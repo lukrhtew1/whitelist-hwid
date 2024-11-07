@@ -50,7 +50,7 @@ def verify_serial():
                 if registered_hwid:
                     if registered_hwid == hwid:
                         # HWID matches, verification successful
-                        return jsonify({"message": "HWID successfully verified"}), 200
+                        return jsonify({"message": "HWID successfully verified", hwid, registered_hwid}), 200
                     else:
                         # HWID mismatch, return the appropriate error
                         return jsonify({"message": "HWID mismatch, cannot register this HWID for the serial key"}), 400
