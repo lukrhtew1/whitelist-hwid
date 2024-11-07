@@ -5,7 +5,7 @@ import os
 app = Flask(__name__)
 
 # Load path to serials.json from environment variable or use default
-json_file_path = os.getenv('SERIAL_KEYS_FILE_PATH', 'serials.json')
+json_file_path = os.getenv('SERIAL_KEYS_FILE_PATH','serials.json')
 
 # Load serial keys
 def load_serial_keys():
@@ -61,9 +61,6 @@ def verify_serial():
         serials[serial_key] = hwid
         print(f"Registered HWID for serial {serial_key}: {hwid}")  # Debug line
 
-        serials[serial_key] = hwid
-        print(f"Registered HWID for serial {serial_key}: {hwid}")  # Debug line
-            
         # Save the updated serials to the JSON file
         return save_serial_keys(serials)
 
