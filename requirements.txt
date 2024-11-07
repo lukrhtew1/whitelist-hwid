@@ -2,3 +2,4 @@ Flask==2.3.2
 requests==2.31.0  # To handle HTTP requests if needed (e.g., for checking HWID, calling external APIs)
 gunicorn==20.1.0  # To run the app in production (Render needs a WSGI server like Gunicorn)
 psycopg2-binary==2.9.5  # PostgreSQL database adapter for Python
+python-dotenv==1.0.0  # To load environment variables from a .env file
