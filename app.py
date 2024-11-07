@@ -40,7 +40,10 @@ def verify_serial():
                 result = cursor.fetchone()
 
                 if not result:
-                    return jsonify({"message": "Invalid serial key"}), 400
+                    # Serial key does not exist, insert it with the HWID
+                    cursor.execute('INSERT INTO my_schema.serials (serial_key, hwid) VALUES (%s, %s)', (serial_key, hwid))
+                    conn.commit()
+                    return jsonify({"message": "Verification successful, HWID registered for new serial key"}), 200
 
                 # If the serial key is already registered with an HWID, check if it matches
                 registered_hwid = result[0]
@@ -50,7 +53,7 @@ def verify_serial():
                     else:
                         return jsonify({"message": "HWID mismatch, cannot register this HWID for the serial key"}), 400
 
-                # Register the HWID for the serial key
+                # Register the HWID for the serial key (update if it was empty)
                 cursor.execute('UPDATE my_schema.serials SET hwid = %s WHERE serial_key = %s', (hwid, serial_key))
                 conn.commit()
 
