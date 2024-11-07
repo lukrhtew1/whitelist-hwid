@@ -3,7 +3,7 @@ import psycopg2
 import os
 from dotenv import load_dotenv
 
-# Load environment variables from.env file
+# Load environment variables from .env file
 load_dotenv()
 
 app = Flask(__name__)
@@ -23,12 +23,10 @@ def get_db_connection():
 
 @app.route('/ping', methods=['GET'])
 def ping():
-    """Return a simple 'pong' response to verify the server is up."""
-    return jsonify({"message": "pong", "status": "ok"}), 200
+    return jsonify({"message": "Server is up and running"}), 200
 
 @app.route('/verify', methods=['POST'])
 def verify_serial():
-    """Verify a serial key and HWID."""
     data = request.get_json()
     serial_key = data.get('serialKey')
     hwid = data.get('hwid')
@@ -57,7 +55,7 @@ def verify_serial():
                 conn.commit()
                 return jsonify({"message": "Verification successful, HWID registered for new serial key"}), 200
 
-            registered_hwid = result <sup> </sup>
+            registered_hwid = result[0]
             if registered_hwid:
                 if registered_hwid == hwid:
                     return jsonify({"message": "HWID successfully verified", "provided_hwid": hwid, "registered_hwid": registered_hwid}), 200
@@ -71,7 +69,6 @@ def verify_serial():
 
 @app.route('/')
 def index():
-    """Return the index.html file."""
     return send_file('index.html')
 
 if __name__ == '__main__':
