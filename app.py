@@ -52,7 +52,7 @@ def verify_serial():
                         # HWID matches, verification successful
                         return jsonify({"message": "HWID successfully verified"}), 200
                     else:
-                        # HWID mismatch, cannot verify
+                        # HWID mismatch, return the appropriate error
                         return jsonify({"message": "HWID mismatch, cannot register this HWID for the serial key"}), 400
 
                 # If the HWID field is empty, update it
