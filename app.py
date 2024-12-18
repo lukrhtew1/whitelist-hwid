@@ -26,6 +26,7 @@ def ping():
     return jsonify({"message": "Server is up and running"}), 200
 
 @app.route('/verify', methods=['POST'])
+@app.route('/verify', methods=['POST'])
 def verify_serial():
     data = request.get_json()
     serial_key = data.get('serialKey')
@@ -45,15 +46,14 @@ def verify_serial():
             if blacklist_result:
                 return jsonify({"message": "Blacklisted"}), 403
 
-            # Proceed with the regular verification if not blacklisted
+            # Check if the serial key exists in the database
             cursor.execute('SET search_path TO my_schema;')
             cursor.execute('SELECT hwid FROM my_schema.serials WHERE serial_key = %s', (serial_key,))
             result = cursor.fetchone()
 
             if not result:
-                cursor.execute('INSERT INTO my_schema.serials (serial_key, hwid) VALUES (%s, %s)', (serial_key, hwid))
-                conn.commit()
-                return jsonify({"message": "Verification successful, HWID registered for new serial key"}), 200
+                # Serial key does not exist in the database
+                return jsonify({"message": "Serial key not found"}), 404
 
             registered_hwid = result[0]
             if registered_hwid:
@@ -62,6 +62,7 @@ def verify_serial():
                 else:
                     return jsonify({"message": "HWID mismatch, cannot register this HWID for the serial key"}), 400
 
+            # If HWID is not registered yet, update it for the serial key
             cursor.execute('UPDATE my_schema.serials SET hwid = %s WHERE serial_key = %s', (hwid, serial_key))
             conn.commit()
 
