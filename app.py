@@ -26,7 +26,6 @@ def ping():
     return jsonify({"message": "Server is up and running"}), 200
 
 @app.route('/verify', methods=['POST'])
-@app.route('/verify', methods=['POST'])
 def verify_serial():
     data = request.get_json()
     serial_key = data.get('serialKey')
